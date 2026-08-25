@@ -23,7 +23,7 @@ const SellActionWindow = ({ uid, availableQty }) => {
     //1. Storage as token nikalo
     const token = localStorage.getItem("zerodha_token");
 
-    axios.post("http://localhost:3002/newOrder", {
+    axios.post(" https://zerodha-clone-ab3x.onrender.com/newOrder", {
       name: uid,
       qty: stockQuantity,
       price: stockPrice,

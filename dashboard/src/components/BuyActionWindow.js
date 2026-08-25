@@ -16,7 +16,7 @@ const BuyActionWindow = ({ uid }) => {
     const token = localStorage.getItem("zerodha_token");
 
     // 2. Request bhejo, par is baar Headers mein token lagakar
-    axios.post("http://localhost:3002/newOrder", {
+    axios.post(" https://zerodha-clone-ab3x.onrender.com/newOrder", {
       name: uid,
       qty: stockQuantity,
       price: stockPrice,
