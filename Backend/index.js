@@ -34,18 +34,16 @@ app.use(bodyParser.json());
 // Testing ke liye OTP memory mein save kar rahe hain
 const otpStorage = {}; 
 
-// Email bhejne ka setup (Fix for Render IPv6 ENETUNREACH error)
-// Email bhejne ka setup (Strictly Forcing IPv4 for Render)
+// Render Free Tier SMTP Bypass (Port 587 + TLS)
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false, // 587 ke liye isko false rakhna hota hai
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER, 
     pass: process.env.EMAIL_PASS  
-  },
-  // YE MAGIC LINE HAI - Isse Render ziddi IPv6 use nahi karega
-  family: 4 
+  }
 });
 
 // 1. SEND OTP API
