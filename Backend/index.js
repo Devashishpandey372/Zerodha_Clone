@@ -34,12 +34,14 @@ app.use(bodyParser.json());
 // Testing ke liye OTP memory mein save kar rahe hain
 const otpStorage = {}; 
 
-// Email bhejne ka setup (Apna Gmail aur App Password dalein)
+// Email bhejne ka setup (Fix for Render IPv6 ENETUNREACH error)
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
-    user: process.env.EMAIL_USER, // e.g., aapka@gmail.com (Dhyan rahe env mein add karein)
-    pass: process.env.EMAIL_PASS  // 16-digit Google App Password
+    user: process.env.EMAIL_USER, 
+    pass: process.env.EMAIL_PASS  
   }
 });
 
