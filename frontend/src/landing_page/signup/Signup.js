@@ -14,7 +14,7 @@ function Signup() {
         e.preventDefault();
         try {
             // Backend ko OTP bhejne ka request (Aapko backend par /send-otp route banana hoga)
-            await axios.post("http://localhost:3002/send-otp", { email });
+            await axios.post("https://zerodha-clone-ab3x.onrender.com/verify-otp", { email });
             alert("OTP sent to your email!");
             setStep(2); // UI ko badal kar OTP wale input par le jao
         } catch (error) {
