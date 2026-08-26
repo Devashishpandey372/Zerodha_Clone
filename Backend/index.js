@@ -35,6 +35,7 @@ app.use(bodyParser.json());
 const otpStorage = {}; 
 
 // Email bhejne ka setup (Fix for Render IPv6 ENETUNREACH error)
+// Email bhejne ka setup (Strictly Forcing IPv4 for Render)
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -42,8 +43,9 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER, 
     pass: process.env.EMAIL_PASS  
-  }
-  family: 4
+  },
+  // YE MAGIC LINE HAI - Isse Render ziddi IPv6 use nahi karega
+  family: 4 
 });
 
 // 1. SEND OTP API
