@@ -6,17 +6,17 @@ function Signup() {
     // State variables
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
-    const [step, setStep] = useState(1); // Step 1: Email dalna, Step 2: OTP verify karna
+    const [step, setStep] = useState(1);
     const navigate = useNavigate();
 
     // Jab user "Get OTP" par click karega
     const handleSendOTP = async (e) => {
         e.preventDefault();
         try {
-            // Backend ko OTP bhejne ka request (Aapko backend par /send-otp route banana hoga)
-            await axios.post("https://zerodha-clone-ab3x.onrender.com/verify-otp", { email });
+            // YAHAN /send-otp HOGA
+            await axios.post("https://zerodha-clone-ab3x.onrender.com/send-otp", { email });
             alert("OTP sent to your email!");
-            setStep(2); // UI ko badal kar OTP wale input par le jao
+            setStep(2); 
         } catch (error) {
             alert("Failed to send OTP. Please try again.");
         }
@@ -26,20 +26,13 @@ function Signup() {
     const handleVerifyOTP = async (e) => {
         e.preventDefault();
         try {
-            // Backend se response receive karna
-            const response = await axios.post(" https://zerodha-clone-ab3x.onrender.com/send-otp", { email, otp });
+            // YAHAN /verify-otp HOGA (Bina kisi space ke)
+            const response = await axios.post("https://zerodha-clone-ab3x.onrender.com/verify-otp", { email, otp });
             
-            // 1. Token ko browser ke Local Storage mein save karna
             localStorage.setItem("token", response.data.token);
-            
             alert("Login Successful!");
             
-            // 2. User ko seedha Dashboard par bhej dena
-            // (Agar aapka dashboard alag React app / port 3001 par chal raha hai toh ye line use karein)
             window.location.href = "https://zerodha-clone-vipv.vercel.app"; 
-            
-            // YA agar dashboard same app mein hai toh: navigate("/dashboard");
-            
         } catch (error) {
             alert("Invalid OTP! Please try again.");
         }
@@ -49,17 +42,14 @@ function Signup() {
         <div className='container mt-5 mb-5'>
             <div className='row align-items-center justify-content-center'>
                 
-                {/* Left Side: Aapki Console aur Kite wali Image */}
                 <div className='col-6 text-center'>
                     <img src='/media/images/account_open.svg' alt="Signup" style={{ width: "90%" }} />
                 </div>
                 
-                {/* Right Side: Form */}
                 <div className='col-5 ps-5'>
                     <h1 className='fs-3 my-3'>Login or Signup</h1>
                     <p className='text-muted mb-4'>Or track your existing application</p>
                     
-                    {/* Yahan Condition Lagayi Hai: Agar Step 1 hai toh Email form, nahi toh OTP form */}
                     {step === 1 ? (
                         <form onSubmit={handleSendOTP}>
                             <h2 className='fs-5 mb-3'>Email Address</h2>
