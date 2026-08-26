@@ -27,7 +27,7 @@ function Signup() {
         e.preventDefault();
         try {
             // Backend se response receive karna
-            const response = await axios.post(" https://zerodha-clone-ab3x.onrender.com/verify-otp", { email, otp });
+            const response = await axios.post(" https://zerodha-clone-ab3x.onrender.com/send-otp", { email, otp });
             
             // 1. Token ko browser ke Local Storage mein save karna
             localStorage.setItem("token", response.data.token);
