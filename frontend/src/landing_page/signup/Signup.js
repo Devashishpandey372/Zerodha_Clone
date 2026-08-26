@@ -36,7 +36,7 @@ function Signup() {
             
             // 2. User ko seedha Dashboard par bhej dena
             // (Agar aapka dashboard alag React app / port 3001 par chal raha hai toh ye line use karein)
-            window.location.href = "http://localhost:3001"; 
+            window.location.href = "https://zerodha-clone-vipv.vercel.app"; 
             
             // YA agar dashboard same app mein hai toh: navigate("/dashboard");
             
