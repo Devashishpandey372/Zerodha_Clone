@@ -34,16 +34,17 @@ app.use(bodyParser.json());
 // Testing ke liye OTP memory mein save kar rahe hain
 const otpStorage = {}; 
 
-// Render Free Tier SMTP Bypass (Port 587 + TLS)
+// Aakhri aur sabse pakka fix: Port 587 + Forcing IPv4
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
-  secure: false, // 587 ke liye isko false rakhna hota hai
+  secure: false, // Port 587 ke liye false
   requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER, 
     pass: process.env.EMAIL_PASS  
-  }
+  },
+  family: 4 // YE LINE SABSE ZAROORI HAI (IPv6 block karne ke liye)
 });
 
 // 1. SEND OTP API
