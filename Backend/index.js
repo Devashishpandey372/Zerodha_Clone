@@ -1,6 +1,9 @@
 // Es line se env ki value system process me chali jayegi
 require('dotenv').config();
 
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first'); // Yeh Node.js ko force karega ki hamesha IPv4 priority de
+
 console.log("EMAIL_USER loaded:", process.env.EMAIL_USER ? "Yes" : "No");
 
 // Express aur baaki packages ko require kar rhe hai 
