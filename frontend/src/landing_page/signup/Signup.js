@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// Automatically detect karega ki local chal raha hai ya Vercel live
+const BACKEND_URL = window.location.hostname === "localhost" 
+    ? "http://localhost:3002" 
+    : "https://zerodha-clone-ab3x.onrender.com";
+
 function Signup() {
     // State variables
     const [email, setEmail] = useState("");
@@ -10,34 +15,33 @@ function Signup() {
     const navigate = useNavigate();
 
     // Jab user "Get OTP" par click karega
-    const handleSendOTP = async (e) => {
-        e.preventDefault();
-        try {
-            // YAHAN /send-otp HOGA
-            await axios.post("https://zerodha-clone-ab3x.onrender.com/send-otp", { email });
-            alert("OTP sent to your email!");
-            setStep(2); 
-        } catch (error) {
-            alert("Failed to send OTP. Please try again.");
-        }
-    };
+  const handleSendOTP = async (e) => {
+      e.preventDefault();
+      try {
+          await axios.post(`${BACKEND_URL}/send-otp`, { email });
+          alert("OTP sent to your email!");
+          setStep(2); 
+      } catch (error) {
+          alert("Failed to send OTP. Please try again.");
+      }
+  };
 
-    // Jab user OTP daal kar "Verify" par click karega
-    const handleVerifyOTP = async (e) => {
-        e.preventDefault();
-        try {
-            // YAHAN /verify-otp HOGA (Bina kisi space ke)
-            const response = await axios.post("https://zerodha-clone-ab3x.onrender.com/verify-otp", { email, otp });
-            
-            localStorage.setItem("token", response.data.token);
-            alert("Login Successful!");
-            
-            window.location.href = "https://zerodha-clone-vipv.vercel.app"; 
-        } catch (error) {
-            alert("Invalid OTP! Please try again.");
-        }
-    };
+  // Jab user OTP daal kar "Verify" par click karega
+  const handleVerifyOTP = async (e) => {
+      e.preventDefault();
+      try {
+          const response = await axios.post(`${BACKEND_URL}/verify-otp`, { email, otp });
+          
+          localStorage.setItem("token", response.data.token);
+          alert("Login Successful!");
+          
+          window.location.href = "https://zerodha-clone-vipv.vercel.app"; 
+      } catch (error) {
+          alert("Invalid OTP! Please try again.");
+      }
+  };
 
+    
     return ( 
         <div className='container mt-5 mb-5'>
             <div className='row align-items-center justify-content-center'>

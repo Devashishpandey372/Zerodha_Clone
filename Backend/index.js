@@ -1,6 +1,8 @@
 // Es line se env ki value system process me chali jayegi
 require('dotenv').config();
 
+console.log("EMAIL_USER loaded:", process.env.EMAIL_USER ? "Yes" : "No");
+
 // Express aur baaki packages ko require kar rhe hai 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -34,17 +36,13 @@ app.use(bodyParser.json());
 // Testing ke liye OTP memory mein save kar rahe hain
 const otpStorage = {}; 
 
-// Aakhri aur sabse pakka fix: Port 587 + Forcing IPv4
+// Gmail ke liye clean aur stable transporter setup
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // Port 587 ke liye false
-  requireTLS: true,
-  auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_PASS  
-  },
-  family: 4 // YE LINE SABSE ZAROORI HAI (IPv6 block karne ke liye)
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS  
+    }
 });
 
 // 1. SEND OTP API
@@ -52,10 +50,7 @@ app.post('/send-otp', async (req, res) => {
     try {
         const { email } = req.body;
         
-        // 6-digit random OTP generate kar rahe hain
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        // OTP ko email ke sath save kar liya
         otpStorage[email] = otp; 
 
         const mailOptions = {
@@ -66,10 +61,11 @@ app.post('/send-otp', async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
+        console.log("OTP sent successfully to:", email); // Success log
         res.status(200).json({ message: "OTP sent successfully!" });
     } catch (error) {
-        console.error("Error sending email: ", error);
-        res.status(500).json({ message: "Failed to send OTP. Check email credentials." });
+        console.error("Detailed Email Error:", error); // Asli error terminal me dikhega
+        res.status(500).json({ message: "Failed to send OTP. Check email credentials.", error: error.message });
     }
 });
 
