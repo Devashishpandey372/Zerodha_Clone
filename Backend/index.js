@@ -39,9 +39,9 @@ app.use(bodyParser.json());
 // Testing ke liye OTP memory mein save kar rahe hain
 const otpStorage = {}; 
 
-// Gmail ke liye clean aur stable transporter setup
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp-relay.brevo.com',
+    port: 587,
     auth: {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS  
