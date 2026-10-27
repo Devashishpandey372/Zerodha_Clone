@@ -42,6 +42,7 @@ const otpStorage = {};
 const transporter = nodemailer.createTransport({
     host: 'smtp-relay.brevo.com',
     port: 587,
+    secure: false, // Port 587 ke liye false hota hai
     auth: {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS  
