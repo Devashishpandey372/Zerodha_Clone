@@ -16,8 +16,13 @@ import NotFound from './landing_page/NotFound';
 import UserLogin from "./landing_page/auth/UserLogin";
 import UserSignup from "./landing_page/auth/UserSignup";
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const GOOGLE_CLIENT_ID = "1036417252822-2eq9lb80p6eo2iouf2a4lmda1kes51j0.apps.googleusercontent.com";
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <GoogleOAuthProvider clientId={"1036417252822-2eq9lb80p6eo2iouf2a4lmda1kes51j0.apps.googleusercontent.com"}>
   <BrowserRouter>
     <Navbar/>
     <Routes>
@@ -34,6 +39,7 @@ root.render(
     </Routes>
     <Footer />
   </BrowserRouter>
+  </GoogleOAuthProvider>
 );
 
 

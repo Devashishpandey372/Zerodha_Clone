@@ -11,7 +11,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const nodemailer = require("nodemailer"); // NAYA: Nodemailer import kiya
+const nodemailer = require("nodemailer");
 
 const { HoldingsModel } = require('./model/HoldingsModel');
 const { PositionsModel } = require('./model/PositionsModel');
@@ -19,8 +19,6 @@ const { OrdersModel } = require("./model/OrdersModel");
 const { UserModel } = require("./model/UserModel");
 
 const jwt = require("jsonwebtoken");
-// const bcrypt = require("bcrypt"); // AB ISKI ZAROORAT NAHI HAI (OTP use kar rahe hain)
-
 const authMiddleware = require("./authMiddleware");
 
 const PORT = process.env.PORT || 3002;
@@ -36,13 +34,12 @@ app.use(bodyParser.json());
 // 📧 EMAIL OTP AUTHENTICATION SETUP
 // ==========================================
 
-// Testing ke liye OTP memory mein save kar rahe hain
 const otpStorage = {}; 
 
 const transporter = nodemailer.createTransport({
     host: 'smtp-relay.brevo.com',
     port: 587,
-    secure: false, // Port 587 ke liye false hota hai
+    secure: false,
     auth: {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS  
@@ -65,10 +62,10 @@ app.post('/send-otp', async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
-        console.log("OTP sent successfully to:", email); // Success log
+        console.log("OTP sent successfully to:", email);
         res.status(200).json({ message: "OTP sent successfully!" });
     } catch (error) {
-        console.error("Detailed Email Error:", error); // Asli error terminal me dikhega
+        console.error("Detailed Email Error:", error);
         res.status(500).json({ message: "Failed to send OTP. Check email credentials.", error: error.message });
     }
 });
@@ -78,28 +75,22 @@ app.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
         
-        // OTP match check karna
         if (otpStorage[email] && otpStorage[email] === otp) {
-            // Verify hone ke baad memory se OTP delete kar do (Security)
             delete otpStorage[email]; 
             
-            // Check karein ki user DB mein pehle se hai ya naya hai
             let user = await UserModel.findOne({ email });
             
-            // Agar naya user hai toh Database mein Save (Signup) kar do
             if (!user) {
                 user = new UserModel({ email });
                 await user.save();
             }
 
-            // JWT Token Generate karein
             const token = jwt.sign(
                 { id: user._id, email: user.email }, 
                 process.env.JWT_SECRET, 
-                { expiresIn: "1d" } // Token 1 din ke baad expire hoga
+                { expiresIn: "1d" }
             );
 
-            // Frontend ko token bhej diya
             res.status(200).json({ token: token, message: "Authentication successful!" });
         } else {
             res.status(400).json({ message: "Invalid or expired OTP!" });
@@ -111,10 +102,50 @@ app.post('/verify-otp', async (req, res) => {
 });
 
 // ==========================================
+// 🌐 GOOGLE AUTHENTICATION API
+// ==========================================
+
+app.post('/google-auth', async (req, res) => {
+    const { email, name, googleId, picture } = req.body;
+
+    try {
+        // UserModel use kiya hai taaki ReferenceError na aaye
+        let user = await UserModel.findOne({ email });
+
+        if (!user) {
+            user = new UserModel({
+                email,
+                name,
+                googleId,
+                isVerified: true
+            });
+            await user.save();
+        }
+
+        // JWT Token Generate karein
+        const token = jwt.sign(
+            { id: user._id, email: user.email }, 
+            process.env.JWT_SECRET || "SECRET_KEY",
+            { expiresIn: "1d" }
+        );
+
+        // Response me token zaroor bheja hai taaki frontend save kar sake
+        res.status(200).json({
+            success: true,
+            token: token,
+            message: "Google Authentication successful",
+            user
+        });
+    } catch (error) {
+        console.error("Google Auth Error:", error);
+        res.status(500).json({ success: false, message: "Server error during Google auth" });
+    }
+});
+
+// ==========================================
 // 📈 TRADING & DASHBOARD APIs
 // ==========================================
 
-// API endpoints for fetching data
 app.get('/allHoldings', async(req, res) => {
     let allHoldings = await HoldingsModel.find({});
     res.json(allHoldings);
@@ -130,14 +161,12 @@ app.get('/allOrders', async(req, res) => {
     res.json(allOrders);
 });
 
-// Naya Order Place karne ki API
 app.post('/newOrder', authMiddleware, async(req, res) => {
     try {
         let { name, qty, price, mode } = req.body;
         let orderQty = Number(qty);
         let orderPrice = Number(price);
 
-        // 1. Order ko database mein save karein
         let newOrder = new OrdersModel({
             name: name,
             qty: orderQty,
@@ -146,7 +175,6 @@ app.post('/newOrder', authMiddleware, async(req, res) => {
         });
         await newOrder.save();
 
-        // 2. Holdings update karne ka logic
         let holding = await HoldingsModel.findOne({ name: name });
 
         if (mode === "BUY") {
@@ -197,7 +225,6 @@ app.post('/newOrder', authMiddleware, async(req, res) => {
 app.listen(PORT, () => {
     console.log("App started on port " + PORT);
     
-    // DB connect kar rahe hain
     mongoose.connect(url)
         .then(() => console.log("DB started and connected!"))
         .catch((err) => console.log("DB Connection Error: ", err));
